@@ -1,0 +1,18 @@
+pipeline {
+    agent { docker { image 'golang:1.22-alpine' } }
+    
+    stages {
+        stage('Clone API Code') {
+            steps {
+                git url: 'https://github.com/Pailin-h3/gin_api.git',
+                    branch: 'develop'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'go mod download'
+                sh 'go build -o api-binary .'
+            }
+        }
+    }
+}
