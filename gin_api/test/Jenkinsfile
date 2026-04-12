@@ -2,6 +2,7 @@ pipeline {
     agent none
     stages {
         stage('Clone API Code') {
+            agent any
             steps {
                 git url: 'https://github.com/Pailin-h3/jenkins.git', branch: 'develop'
             }
