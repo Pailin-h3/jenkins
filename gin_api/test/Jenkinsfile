@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'golang:1.22-alpine'
-            args '-u root:root -e GOCACHE=/tmp/.cache'
-        }
-    }
+    agent none
     stages {
         stage('Clone API Code') {
             steps {
@@ -12,6 +7,12 @@ pipeline {
             }
         }
         stage('Build') {
+            agent {
+                docker {
+                    image 'golang:1.22-alpine'
+                    args '-u root:root -e GOCACHE=/tmp/.cache'
+                }
+            }
             steps {
                 sh 'apk add --no-cache git' 
                 sh 'go mod download'
@@ -19,6 +20,7 @@ pipeline {
             }
         }
         stage('Deploy') {
+            agent any
             steps {
                 script {
                     sh 'docker rm -f gin-api-test || true'
