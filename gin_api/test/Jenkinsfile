@@ -1,15 +1,19 @@
 pipeline {
-    agent { docker { image 'golang:1.22-alpine' } }
-    
+    agent {
+        docker {
+            image 'golang:1.22-alpine'
+            args '-u root:root -e GOCACHE=/tmp/.cache'
+        }
+    }
     stages {
         stage('Clone API Code') {
             steps {
-                git url: 'https://github.com/Pailin-h3/gin_api.git',
-                    branch: 'develop'
+                git url: 'https://github.com/Pailin-h3/jenkins.git', branch: 'develop'
             }
         }
         stage('Build') {
             steps {
+                sh 'apk add --no-cache git' 
                 sh 'go mod download'
                 sh 'go build -o api-binary .'
             }
