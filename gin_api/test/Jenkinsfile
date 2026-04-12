@@ -15,7 +15,7 @@ pipeline {
             steps {
                 sh 'apk add --no-cache git' 
                 sh 'go mod download'
-                sh 'go build -o api-binary .'
+                sh 'go build -buildvcs=false -o api-binary .'
             }
         }
     }
