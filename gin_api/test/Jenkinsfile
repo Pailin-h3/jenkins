@@ -29,7 +29,7 @@ pipeline {
                     sh 'docker rm -f gin-api-test || true'
                     
                     // Build the image using the Dockerfile and binary in the current workspace
-                    sh 'docker build --no-cache -t gin-api-test:latest .'
+                    sh 'docker build --no-cache -t gin-api-test:latest -f gin_api/Dockerfile .'
                     
                     // Run it
                     sh 'docker run -d --name gin-api-test -p 3000:8080 gin-api-test:latest'
