@@ -11,6 +11,9 @@
 7. now we should see jenkins is running on localhost:8080
 8. to get into container
     $docker exec -it <container_name> bash
+9. to stop everything
+    $docker stop <container_name>
+    $Stop-Process -Name "api-binary" -Force -ErrorAction SilentlyContinue
 9. to clear messy jenkins workspace
     $docker image prune -f
     $docker system prune -a --volumes
