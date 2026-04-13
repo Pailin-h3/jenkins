@@ -9,22 +9,17 @@ pipeline {
                 }
             }
             steps {
-                // Step 1: Checkout
-                // We use 'dir' to ensure we are pulling fresh code into a clean spot
                 dir('api-workspace') {
-                    branches: [[name: 'develop']], 
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/Pailin-h3/jenkins.git',
-                        credentialsId: 'pailin_git',
-                        // This 'refspec' tells git exactly how to map the branches
-                        refspec: '+refs/heads/develop:refs/remotes/origin/develop'
-                    ]],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [],
-                    submoduleCfg: []
+                    checkout([$class: 'GitSCM', 
+                        branches: [[name: 'develop']], 
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/Pailin-h3/jenkins.git',
+                            credentialsId: 'pailin_git',
+                            refspec: '+refs/heads/develop:refs/remotes/origin/develop'
+                        ]]
+                    ])
                 }
 
-                // Step 2: Build
                 sh '''
                     cd api-workspace
                     apk add --no-cache git
