@@ -23,15 +23,19 @@ pipeline {
             agent any
             steps {
                 script {
-                    // Force a list to see what files are actually here in the logs
-                    sh 'ls -lh' 
-                    
+                    // 1. Clean up old containers
                     sh 'docker rm -f gin-api-test || true'
                     
-                    // Build the image using the Dockerfile and binary in the current workspace
-                    sh 'docker build --no-cache -t gin-api-test:latest -f gin_api/Dockerfile .'
+                    // 2. IMPORTANT: Move the CORRECT Dockerfile from your API repo 
+                    // to the root, or just use the one that is there if you updated it.
+                    // Based on your logs, the one in root is likely the "Jenkins" one.
                     
-                    // Run it
+                    sh 'cp gin_api/Dockerfile ./Dockerfile || echo "Using existing root Dockerfile"'
+                    
+                    // 3. Build using the local Dockerfile
+                    sh 'docker build --no-cache -t gin-api-test:latest .'
+                    
+                    // 4. Run
                     sh 'docker run -d --name gin-api-test -p 3000:8080 gin-api-test:latest'
                     
                     echo "API is live at http://localhost:3000"
