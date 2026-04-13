@@ -9,13 +9,16 @@ pipeline {
                 }
             }
             steps {
-                // 1. Pull the API code into its own folder
                 dir('api-repo') {
-                    git url: 'https://github.com/Pailin-h3/jenkins.git', branch: 'develop'
+                    // Updated git syntax for better branch tracking
+                    checkout([$class: 'GitSCM', 
+                        branches: [[name: '*/develop']], 
+                        userRemoteConfigs: [[url: 'https://github.com/Pailin-h3/jenkins.git']]
+                    ])
                     
                     sh 'apk add --no-cache git' 
                     sh 'go mod download'
-                    // 2. Build and move the binary UP to the root workspace
+                    // Build and move the binary up so the Deploy stage can find it
                     sh 'go build -buildvcs=false -o ../api-binary .'
                 }
             }
