@@ -13,6 +13,7 @@
     $docker exec -it <container_name> bash
 9. to clear messy jenkins workspace
     $docker image prune -f
+    $docker system prune -a --volumes
 
 most of the user are pailin-h3 or pailinh3
 most of the password are isylzjko
