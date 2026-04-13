@@ -23,19 +23,27 @@ pipeline {
             agent any
             steps {
                 script {
-                    // 1. Clean up old containers
+                    // 1. Kill the old container
                     sh 'docker rm -f gin-api-test || true'
                     
-                    // 2. IMPORTANT: Move the CORRECT Dockerfile from your API repo 
-                    // to the root, or just use the one that is there if you updated it.
-                    // Based on your logs, the one in root is likely the "Jenkins" one.
+                    // 2. DELETE the wrong Dockerfile that Jenkins keeps checking out
+                    sh 'rm -f Dockerfile'
                     
-                    sh 'cp gin_api/Dockerfile ./Dockerfile || echo "Using existing root Dockerfile"'
+                    // 3. Create the CORRECT Dockerfile from scratch right here
+                    // This guarantees no Jenkins-image confusion!
+                    writeFile file: 'Dockerfile', text: """
+                        FROM alpine:latest
+                        RUN apk --no-cache add ca-certificates
+                        WORKDIR /root/
+                        COPY api-binary .
+                        RUN chmod +x api-binary
+                        CMD ["./api-binary"]
+                    """
                     
-                    // 3. Build using the local Dockerfile
+                    // 4. Build (it will now use the tiny Alpine file we just wrote)
                     sh 'docker build --no-cache -t gin-api-test:latest .'
                     
-                    // 4. Run
+                    // 5. Run
                     sh 'docker run -d --name gin-api-test -p 3000:8080 gin-api-test:latest'
                     
                     echo "API is live at http://localhost:3000"
