@@ -23,9 +23,17 @@ pipeline {
             agent any
             steps {
                 script {
+                    // Force a list to see what files are actually here in the logs
+                    sh 'ls -lh' 
+                    
                     sh 'docker rm -f gin-api-test || true'
-                    sh 'docker build -t gin-api-test:latest .'
+                    
+                    // Build the image using the Dockerfile and binary in the current workspace
+                    sh 'docker build --no-cache -t gin-api-test:latest .'
+                    
+                    // Run it
                     sh 'docker run -d --name gin-api-test -p 3000:8080 gin-api-test:latest'
+                    
                     echo "API is live at http://localhost:3000"
                 }
             }
