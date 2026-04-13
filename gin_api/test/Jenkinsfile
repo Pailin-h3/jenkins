@@ -9,23 +9,13 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    sh 'apk add --no-cache git'
-                    
-                    // 1. Tell Git to trust this workspace folder
-                    sh 'git config --global --add safe.directory /var/jenkins_home/workspace/gin-api/gin-api-test'
-                    
-                    // 2. Now perform the fast fetch
-                    sh 'git fetch --depth=1 origin develop'
-                    sh 'git checkout FETCH_HEAD'
-                    
-                    // 3. Debug check: See if your 0.0.0.0 code is actually here
-                    sh 'grep "router.Run" main.go || grep "router.Run" gin_api/main.go || echo "main.go not found"'
-                    
-                    // 4. Build
-                    sh 'go mod download'
-                    sh 'go build -buildvcs=false -o api-binary .'
-                }
+                // 1. Pull the API code directly into the Go container
+                git url: 'https://github.com/Pailin-h3/jenkins.git', branch: 'develop'
+                
+                // 2. Prep and Build
+                sh 'apk add --no-cache git' 
+                sh 'go mod download'
+                sh 'go build -buildvcs=false -o api-binary .'
             }
         }
         
@@ -33,21 +23,27 @@ pipeline {
             agent any
             steps {
                 script {
+                    // 1. Kill the old container
                     sh 'docker rm -f gin-api-test || true'
+                    
+                    // 2. DELETE the wrong Dockerfile that Jenkins keeps checking out
                     sh 'rm -f Dockerfile'
                     
+                    // 3. Create the CORRECT Dockerfile from scratch right here
+                    // This guarantees no Jenkins-image confusion!
                     writeFile file: 'Dockerfile', text: """
                         FROM alpine:latest
                         RUN apk --no-cache add ca-certificates
                         WORKDIR /root/
                         COPY api-binary .
                         RUN chmod +x api-binary
-                        # Force Gin to release mode to skip the 'localhost' debug message
-                        ENV GIN_MODE=release
                         CMD ["./api-binary"]
                     """
                     
+                    // 4. Build (it will now use the tiny Alpine file we just wrote)
                     sh 'docker build --no-cache -t gin-api-test:latest .'
+                    
+                    // 5. Run
                     sh 'docker run -d --name gin-api-test -p 3000:8080 gin-api-test:latest'
                     
                     echo "API is live at http://localhost:3000"
