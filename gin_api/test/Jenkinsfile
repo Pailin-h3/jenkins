@@ -14,7 +14,8 @@ pipeline {
                 dir('api-workspace') {
                     checkout([$class: 'GitSCM', 
                         branches: [[name: '*/develop']], 
-                        userRemoteConfigs: [[url: 'https://github.com/Pailin-h3/jenkins.git']]
+                        userRemoteConfigs: [[url: 'https://github.com/Pailin-h3/jenkins.git']],
+                        credentialsId: 'pailin_git'
                     ])
                 }
 
