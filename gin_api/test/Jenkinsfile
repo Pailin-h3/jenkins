@@ -13,7 +13,7 @@ pipeline {
                     checkout([$class: 'GitSCM', 
                         branches: [[name: 'develop']], 
                         userRemoteConfigs: [[
-                            url: 'https://github.com/Pailin-h3/jenkins.git',
+                            url: 'https://github.com/Pailin-h3/gin_api.git',
                             credentialsId: 'pailin_git',
                             refspec: '+refs/heads/develop:refs/remotes/origin/develop'
                         ]]
