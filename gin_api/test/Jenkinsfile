@@ -1,12 +1,6 @@
 pipeline {
     agent none
     stages {
-        stage('Clone API Code') {
-            agent any
-            steps {
-                git url: 'https://github.com/Pailin-h3/jenkins.git', branch: 'develop'
-            }
-        }
         stage('Build') {
             agent {
                 docker {
@@ -15,11 +9,16 @@ pipeline {
                 }
             }
             steps {
+                // 1. Pull the API code directly into the Go container
+                git url: 'https://github.com/Pailin-h3/jenkins.git', branch: 'develop'
+                
+                // 2. Prep and Build
                 sh 'apk add --no-cache git' 
                 sh 'go mod download'
                 sh 'go build -buildvcs=false -o api-binary .'
             }
         }
+        
         stage('Deploy') {
             agent any
             steps {
@@ -27,7 +26,6 @@ pipeline {
                     sh 'docker rm -f gin-api-test || true'
                     sh 'docker build -t gin-api-test:latest .'
                     sh 'docker run -d --name gin-api-test -p 3000:8080 gin-api-test:latest'
-                    
                     echo "API is live at http://localhost:3000"
                 }
             }
