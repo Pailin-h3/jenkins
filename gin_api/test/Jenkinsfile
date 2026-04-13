@@ -12,18 +12,17 @@ pipeline {
                 script {
                     sh 'apk add --no-cache git'
                     
-                    // 1. Fetch ONLY the develop branch with a depth of 1 (no history)
-                    sh 'git fetch --depth=1 origin develop'
+                    // 1. Tell Git to trust this workspace folder
+                    sh 'git config --global --add safe.directory /var/jenkins_home/workspace/gin-api/gin-api-test'
                     
-                    // 2. Force the workspace to match the fetched develop branch
+                    // 2. Now perform the fast fetch
+                    sh 'git fetch --depth=1 origin develop'
                     sh 'git checkout FETCH_HEAD'
                     
-                    // 3. DEBUG: Verify the code is what you expect
-                    // This will prove if your 0.0.0.0 change is actually there
+                    // 3. Debug check: See if your 0.0.0.0 code is actually here
                     sh 'grep "router.Run" main.go || grep "router.Run" gin_api/main.go || echo "main.go not found"'
                     
-                    // 4. Build (adjust directory if your code is in a subfolder)
-                    // If main.go is in gin_api folder: sh 'cd gin_api && go build -o ../api-binary .'
+                    // 4. Build
                     sh 'go mod download'
                     sh 'go build -buildvcs=false -o api-binary .'
                 }
