@@ -2,7 +2,7 @@
 2. run below command to create network, recommend name: jenkins
     $docker network create <network_name>
 3. you can check network by this command
-    $decker network ls
+    $docker network ls
 4. create Dockerfile (I already created it)
 5. cd to Dockerfile and run below command to build first image of jenkins, recommend name: jenkins-blueocean:1.0
     $docker build -t <image_name:image_version> .
