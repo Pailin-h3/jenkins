@@ -7,12 +7,14 @@
 5. cd to Dockerfile and run below command to build first image of jenkins, recommend name: jenkins-blueocean:1.0
     $docker build -t <image_name:image_version> .
 6. run jenkins image in docker container, recommend container name: jenkins-blueocean
-    $docker run --name <container_name>  --restart=on-failure  --detach  -v /var/run/docker.sock:/var/run/docker.sock  -v jenkins-data:/var/jenkins_home  --publish 8080:8080  --publish 50000:50000  <image_name:image_version or image_id>
-7. now we should see jenkins is running on localhost:8080
+    $docker run --name jenkins-blueocean  --restart=on-failure  --detach  -v /var/run/docker.sock:/var/run/docker.sock  -v jenkins-data:/var/jenkins_home  -v $(pwd)/jenkins.yaml:/var/jenkins_home/casc_configs/jenkins.yaml  --publish 8080:8080  --publish 50000:50000  jenkins-blueocean:1.0
 8. to get into container
     $docker exec -it <container_name> bash
+9. to see consoles logs from container
+    $docker logs -f <container_name>
 9. to stop everything
     $docker stop <container_name>
+    $docker rm <container_name>
     $Stop-Process -Name "api-binary" -Force -ErrorAction SilentlyContinue
 9. to clear messy jenkins workspace
     $docker image prune -f

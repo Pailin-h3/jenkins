@@ -1,0 +1,6 @@
+configuration-as-code
+job-dsl
+blueocean
+docker-workflow
+remote-file
+pipeline-stage-view

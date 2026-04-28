@@ -1,0 +1,59 @@
+jenkins:
+  systemMessage: "Jenkins is configured via Code in GitHub Codespaces!"
+  numExecutors: 2
+  mode: NORMAL
+  scmCheckoutRetryCount: 3
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: "pailin"
+              username: "Pailin-h3"
+              password: "${GITHUB_TOKEN}"
+
+unclassified:
+  location:
+    url: http://localhost:8080/ # GitHub Codespaces will handle the real URL
+  
+jobs:
+  - script: >
+      pipelineJob('My-First-Cloud-Pipeline') {
+        definition {
+          cps {
+            script("""
+              pipeline {
+                agent any
+                stages {
+                  stage('Hello') {
+                    steps {
+                      echo 'This job was created automatically by JCasC!'
+                    }
+                  }
+                }
+              }
+            """.stripIndent())
+          }
+        }
+      },
+      folder('gin-api') {
+        description('Folder for GIN API related projects')
+      },
+      pipelineJob('gin-api/gin-api-test') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/Pailin-h3/jenkins.git')
+                  credentials('pailin')
+                }
+                branches('*/main') # Adjust if your branch is 'master'
+              }
+            }
+            scriptPath('gin_api/test/Jenkinsfile') # Jenkins will look for this file in your repo
+          }
+        }
+      }
